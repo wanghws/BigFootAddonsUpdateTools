@@ -1,18 +1,19 @@
 {
-  "name": "bigfoot",
+  "name": "BigFootAddonsUpdateTools",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "BigFoot AddOns Update Tools",
+  "repository": "https://github.com/wanghws/BigFootAddonsUpdateTools",
+  "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "author": "",
+  "author": "wanghws@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^6.1.1",
-    "electron-reloader": "^0.3.0"
+    "electron": "^6.1.1"
   },
   "dependencies": {
-    "electron-dl": "^1.14.0"
+    "adm-zip": "^0.4.13",
+    "electron-dl": "^2.0.0"
   }
 }

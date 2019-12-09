@@ -2,13 +2,30 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <title>大脚插件整合包更新器</title>
+    <link rel="stylesheet" href="./css/uikit.min.css" />
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
   </head>
   <body>
-        /Applications/World of Warcraft/_classic_/Interface
-      <p><input id="version" value="" readonly="readonly"></p>
-    <p><input id="download-button" type="button" style="width: 200px;height: 200px;" value="检查更新1"></p>
+      <div class="uk-card uk-card-large uk-card-body">
+        <h3 class="uk-card-title">魔兽世界怀旧服大脚插件整合包更新器</h3>
+        <div id="version" class="uk-label uk-card-badge">发现新版本!</div>
+        <div class="uk-text-left uk-text-small">
+            Mac OS 的魔兽世界怀旧服安装目录为: 
+            <p>/Applications/World of Warcraft/_classic_/Interface/AddOns/</p>
+        </div>
+        <progress id="js-progressbar" class="uk-progress" value="0" max="100"></progress>
+        <input id="updateButton" type="button" class="uk-button uk-button-primary uk-button-large uk-align-center"
+          value="检查更新">
+        <p class="uk-text-center">
+            <dev id="versionSpinner" uk-spinner="ratio: 1" ></dev>
+        </p>
+        <div class="uk-text-center">
+          版本:0.0.1 &nbsp;&nbsp;<a href="#" class="uk-icon-button  uk-margin-small-right" uk-icon="github"></a>
+        </div>
+      </div>
+      <script src="./js/uikit.min.js"></script>
+      <script src="./js/uikit-icons.min.js"></script>
+      <script src="update.js"></script>
   </body>
 </html>
