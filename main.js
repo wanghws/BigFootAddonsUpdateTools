@@ -1,9 +1,9 @@
-const {app, BrowserWindow, ipcMain, nativeImage} = require('electron');
-const {download} = require('electron-dl');
-const path = require('path');
-const fs = require('fs');
-const AdmZip = require('adm-zip');
-
+const { app, BrowserWindow, ipcMain, nativeImage, net } = require('electron')
+const { download } = require('electron-dl')
+const { join } = require('path')
+const { unlinkSync } = require('fs')
+const AdmZip = require('adm-zip')
+const cheerio = require('cheerio')
 
 const wowDir = "/Applications/World of Warcraft/_classic_/Interface/AddOns/";
 // 保持对window对象的全局引用，如果不这么做的话，当JavaScript对象被
@@ -16,8 +16,7 @@ global.sharedObject = {
   }
 
 function createWindow() {
-    var image = nativeImage.createFromPath(path.join(__dirname, './logo.png')); 
-    console.log(image)
+    var image = nativeImage.createFromPath(join(__dirname, './logo.png')); 
     // 创建浏览器窗口。
     win = new BrowserWindow({
         icon: image,
@@ -43,24 +42,16 @@ function createWindow() {
         win = null
     })
 
+    ipcMain.on('load', async (event, url) => {
+       load(url)
+    });
+
     ipcMain.on('updateAddons', async (event, update) => {
         const win = BrowserWindow.getFocusedWindow();
-        console.log(update)
         await download(win, update.url,{
             showBadge:true,
             directory: wowDir,
             onStarted: function(item){
-                item.on('updated', (event, state) => {
-                    if (state === 'interrupted') {
-                      console.log('Download is interrupted but can be resumed')
-                    } else if (state === 'progressing') {
-                      if (item.isPaused()) {
-                        console.log('Download is paused')
-                      } else {
-                        console.log(`Received bytes: ${item.getReceivedBytes()}`)
-                      }
-                    }
-                });
                 item.once('done', (event, state) => {
                     if (state === 'completed') {
                         console.log(item.getSavePath());
@@ -71,12 +62,9 @@ function createWindow() {
                 });
             },
             onProgress:function(progress){
-                global.sharedObject.downloadProgress = progress.percent
-                // bar.value += progress * 100;
-    
-                // if (bar.value >= bar.max) {
-                //     return;
-                // }
+                win.webContents.send('updateProgress', progress)
+                //global.sharedObject.downloadProgress = progress.percent
+            
             }
         });
     });
@@ -107,18 +95,54 @@ app.on('activate', () => {
 function unzip(item){
     const unzip = new AdmZip(item.getSavePath());
     unzip.extractAllTo(wowDir,true);
+    win.webContents.send('unzipFinish', {})
     clean(item.getSavePath());
 }
 
 function clean(file){
     try {
-        fs.unlinkSync(file)
         //file removed
+        unlinkSync(file)
     } catch (err) {
-        console.error(err)
+        alert(`ERROR: ${JSON.stringify(err)}`)
+        win.webContents.send('updateError', {})
     }
+    win.webContents.send('cleanFinish', {})
+}
+function load(url){
+    var data;
+    const request = net.request({
+        method: 'GET',
+        url: url
+    })
+    request.on('response', (response) => {
+        response.on('data', (chunk) => {
+            data += `${chunk}`
+        })
+        response.on('error', (error) => {
+            alert(`ERROR: ${JSON.stringify(error)}`)
+            win.webContents.send('updateError', {})
+        })
+        response.on('end', () => {
+            parser(data)
+        });
+
+    })
+    request.end();
 }
 
-// 在这个文件中，你可以续写应用剩下主进程代码。
-// 也可以拆分成几个文件，然后用 require 导入。
-// npm install --save-dev electron@6.1.1 --verbose --registry=http://registry.npm.taobao.org --electron_mirror="https://npm.taobao.org/mirrors/electron/"
+function parser(html){
+    const $ = cheerio.load(html)
+    var version = ''
+    $('div .brbr-info').find('p').each(function(index, element){
+        
+        if(index <= 1){
+            version += $(this).text()+"  ";
+        }
+    });
+    var zip = ''
+    $('div .brbr-title').find('a').each(function(index, element){
+        zip = $(this).attr('href');
+    });
+    win.webContents.send('bigfootUpdate', {"version":version,"zip":zip})
+}

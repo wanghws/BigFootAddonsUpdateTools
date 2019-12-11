@@ -9,14 +9,17 @@
   <body>
       <div class="uk-card uk-card-large uk-card-body">
         <h3 class="uk-card-title">魔兽世界怀旧服大脚插件整合包更新器</h3>
-        <div id="version" class="uk-label uk-card-badge">发现新版本!</div>
+        <div id="version" class="uk-label uk-card-badge" style="display: none;">发现新版本!</div>
         <div class="uk-text-left uk-text-small">
             Mac OS 的魔兽世界怀旧服安装目录为: 
             <p>/Applications/World of Warcraft/_classic_/Interface/AddOns/</p>
         </div>
-        <progress id="js-progressbar" class="uk-progress" value="0" max="100"></progress>
+        <div class="uk-text-left uk-text-small" >
+          <span id="bigfootVersion">&nbsp;</span>&nbsp;&nbsp;<span id="status">&nbsp;</span>
+        </div>
+        <progress id="js-progressbar" class="uk-progress" value="0" max="1"></progress>
         <input id="updateButton" type="button" class="uk-button uk-button-primary uk-button-large uk-align-center"
-          value="检查更新">
+          value="开始更新" style="display: none;">
         <p class="uk-text-center">
             <dev id="versionSpinner" uk-spinner="ratio: 1" ></dev>
         </p>

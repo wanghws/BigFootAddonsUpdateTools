@@ -10,10 +10,12 @@
   "author": "wanghws@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^6.1.1"
+    "electron": "^6.1.1",
+    "electron-rebuild": "^1.8.8"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
+    "cheerio": "^1.0.0-rc.3",
     "electron-dl": "^2.0.0"
   }
 }
