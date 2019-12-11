@@ -25,3 +25,9 @@ npm start
 ```javascript
 npm run dist
 ```
+
+## 更新流程
+- 抓取 http://bigfoot.178.com/wow/ 页面
+- 解析更新版本号和整合包下载地址
+- 下载解压覆盖到 /Applications/World of Warcraft/_classic_/ (整合包里默认从 Interface/ 目录开始)
+- 删除压缩包
