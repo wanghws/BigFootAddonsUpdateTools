@@ -31,6 +31,4 @@ UIkit.util.ready(function () {
         }, 1000);
 
     });
-
-    
 });
