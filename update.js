@@ -1,8 +1,8 @@
 'use strict';
 const { ipcRenderer } = require('electron')
+const shell = require('electron').shell;
 
-
-let updateZip = 'https://help.cr-institution.cn/test.zip'
+let   updateZip = ''
 const bigFoot = 'http://bigfoot.178.com/wow/'
 
 const updateButton = document.getElementById('updateButton')
@@ -10,8 +10,10 @@ const versionSpinner = document.getElementById('versionSpinner')
 const bar = document.getElementById('js-progressbar');
 const bigfootVersion = document.getElementById('bigfootVersion');
 const status = document.getElementById('status');
+const github = document.getElementById('github');
 
 UIkit.util.ready(function () {
+
     ipcRenderer.send('load', bigFoot)
 
     updateButton.addEventListener('click', async () => {
@@ -20,6 +22,10 @@ UIkit.util.ready(function () {
         updateButton.disabled = true;    
         status.className = ''
         status.innerText = ''    
+    });
+
+    github.addEventListener('click',() => {
+        shell.openExternal('https://github.com/wanghws/BigFootAddonsUpdateTools');
     });
 });
 
@@ -33,9 +39,10 @@ ipcRenderer.on("bigfootUpdate",async (event, message) => {
 ipcRenderer.on("updateError",async (event, message) => {
     versionSpinner.style.display = 'none';
     updateButton.style.display = 'block';
-    updateButton.disabled = false;
     status.className = 'uk-text-danger'
     status.innerText = '更新失败'
+    updateButton.value = '开始更新';
+    updateButton.disabled = false;
 })
 
 ipcRenderer.on("updateProgress",async (event, progress) => {

@@ -1,11 +1,12 @@
 const { app, BrowserWindow, ipcMain, nativeImage, net } = require('electron')
 const { download } = require('electron-dl')
 const { join } = require('path')
-const { unlinkSync } = require('fs')
+const fs = require('fs')
 const AdmZip = require('adm-zip')
 const cheerio = require('cheerio')
 
-const wowDir = "/Applications/World of Warcraft/_classic_/Interface/AddOns/";
+const addOnsPath = "/Applications/World of Warcraft/_classic_/";
+
 // 保持对window对象的全局引用，如果不这么做的话，当JavaScript对象被
 // 垃圾回收的时候，window对象将会自动的关闭
 
@@ -21,7 +22,7 @@ function createWindow() {
     win = new BrowserWindow({
         icon: image,
         width: 600,
-        height: 440,
+        height: 420,
         webPreferences: {
             nodeIntegration: true
         }
@@ -50,14 +51,13 @@ function createWindow() {
         const win = BrowserWindow.getFocusedWindow();
         await download(win, update.url,{
             showBadge:true,
-            directory: wowDir,
+            directory: addOnsPath,
             onStarted: function(item){
                 item.once('done', (event, state) => {
                     if (state === 'completed') {
-                        console.log(item.getSavePath());
                         unzip(item);
                     } else {
-                      console.log(`Download failed: ${state}`)
+                      callback()
                     }
                 });
             },
@@ -93,22 +93,26 @@ app.on('activate', () => {
 })
 
 function unzip(item){
-    const unzip = new AdmZip(item.getSavePath());
-    unzip.extractAllTo(wowDir,true);
-    win.webContents.send('unzipFinish', {})
-    clean(item.getSavePath());
-}
+    const zip = new AdmZip(item.getSavePath());
 
-function clean(file){
-    try {
-        //file removed
-        unlinkSync(file)
-    } catch (err) {
-        alert(`ERROR: ${JSON.stringify(err)}`)
+    var AddOns;
+    zip.getEntries().forEach(function(entry) {
+        if(entry.isDirectory && entry.entryName === "Interface/AddOns/"){
+            AddOns = entry;
+        }
+    });
+    if(!AddOns){
         win.webContents.send('updateError', {})
+        return
     }
+    
+    zip.extractAllTo(addOnsPath,true);
+    win.webContents.send('unzipFinish', {})
+    
+    fs.unlinkSync(item.getSavePath(),callback)
     win.webContents.send('cleanFinish', {})
 }
+
 function load(url){
     var data;
     const request = net.request({
@@ -120,8 +124,7 @@ function load(url){
             data += `${chunk}`
         })
         response.on('error', (error) => {
-            alert(`ERROR: ${JSON.stringify(error)}`)
-            win.webContents.send('updateError', {})
+            callback(err)
         })
         response.on('end', () => {
             parser(data)
@@ -145,4 +148,9 @@ function parser(html){
         zip = $(this).attr('href');
     });
     win.webContents.send('bigfootUpdate', {"version":version,"zip":zip})
+}
+
+function callback(err){
+    console.log(`ERROR: ${JSON.stringify(error)}`)
+    win.webContents.send('updateError', {})
 }

@@ -1,21 +1,46 @@
 {
-  "name": "BigFootAddonsUpdateTools",
+  "name": "BigFootAddOnsUpdateTools",
   "version": "1.0.0",
   "description": "BigFoot AddOns Update Tools",
   "repository": "https://github.com/wanghws/BigFootAddonsUpdateTools",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.github.wanghws.bigfoot",
+    "productName": "BigFootAddOnsUpdateTools",
+    "copyright": "wanghws@gmail.com",
+    "icon": "./images/logo.png",
+    "directories": {
+      "output": "dist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
   },
   "author": "wanghws@gmail.com",
   "license": "ISC",
   "devDependencies": {
     "electron": "^6.1.1",
-    "electron-rebuild": "^1.8.8"
+    "electron-builder": "^21.2.0"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
     "cheerio": "^1.0.0-rc.3",
-    "electron-dl": "^2.0.0"
+    "electron-dl": "^2.0.0",
+    "electron-log": "^4.0.0"
   }
 }
